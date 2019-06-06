@@ -5,10 +5,10 @@ metadata:
  labels:
    type: local
 spec:
- storageClassName: manual
+# we will be using the default dynamic storage provisioner      storageClassName: manual
  capacity:
    storage: 100Mi
  accessModes:
    - ReadWriteOnce
  hostPath:
-   path: "{path-to-your}/kubedata/todo/elastic"
+   path: "/Users/mbergljung/kubedata/todo/elastic"

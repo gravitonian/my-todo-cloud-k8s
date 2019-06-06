@@ -11,4 +11,4 @@ spec:
  accessModes:
    - ReadWriteOnce
  hostPath:
-   path: "{path-to-your}/kubedata/todo/postgres"
+   path: "/Users/mbergljung/kubedata/todo/postgres"

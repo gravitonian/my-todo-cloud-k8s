@@ -4,7 +4,7 @@ metadata:
   namespace: todo
   name: postgres-data-pvc
 spec:
-  storageClassName: manual
+#  storageClassName: manual
   accessModes:
   - ReadWriteOnce
   resources:
