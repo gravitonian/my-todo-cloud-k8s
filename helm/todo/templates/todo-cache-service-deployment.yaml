@@ -1,0 +1,34 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: {{ template "todo.fullname" . }}-todo
+  name: todo-cache-service
+  labels:
+    todo-app-deployment: todo-cache-service
+spec:
+  replicas: {{ .Values.replicas.todoCacheService }}
+  selector:
+      matchLabels:
+        todo-app-pod: todo-cache-service
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        todo-app-pod: todo-cache-service
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: todo-cache-service
+        image: {{ .Values.todoImageUser  }}/todo-cache-service:{{ .Values.todoVersion }}
+        envFrom:
+          - configMapRef:
+              name: todo-config
+        ports:
+        - containerPort: 3000
+        resources:
+          limits:
+            memory: "134217728"

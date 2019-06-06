@@ -1,0 +1,10 @@
+## Enable possibility to skip login
+enableSkipLogin: true
+
+## Serve application over HTTP without TLS
+enableInsecureLogin: true
+
+rbac:
+  # Specifies whether RBAC resources should be created
+  create: false
+

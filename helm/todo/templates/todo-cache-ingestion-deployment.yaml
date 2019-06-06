@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: {{ template "todo.fullname" . }}-todo
+  name: todo-cache-ingestion
+  labels:
+    todo-app-deployment: todo-cache-ingestion
+spec:
+  replicas: {{ .Values.replicas.todoCacheIngestion }}
+  selector:
+      matchLabels:
+        todo-app-pod: todo-cache-ingestion
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        todo-app-pod: todo-cache-ingestion
+    spec:
+      restartPolicy: Always
+      initContainers:
+      - name: init-rabbitmq
+        image: busybox
+        command: ['sh', '-c', 'until nslookup todo-rabbitmq; do echo waiting for RabbitMQ; sleep 2; done;']
+      containers:
+      - image: {{ .Values.todoImageUser  }}/todo-cache-ingestion:{{ .Values.todoVersion }}
+        name: todo-cache-ingestion
+        envFrom:
+          - configMapRef:
+              name: todo-config
+        resources:
+          limits:
+            memory: "134217728"
