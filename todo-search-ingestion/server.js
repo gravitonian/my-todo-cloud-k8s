@@ -5,7 +5,8 @@ const envProps = require('./env_props');
 // Elasticsearch Client Setup //////////////////////////////////////////////////////////////////////////////////////////
 const elasticClient = new elasticsearch.Client({
     // hosts: [ envProps.elasticHost + ':' + envProps.elasticPort]
-    hosts: [ envProps.elasticHost ]
+    hosts: [ envProps.elasticHost ],
+    log: 'trace'
 });
 
 const TODO_SEARCH_INDEX_NAME = "todos";
@@ -16,7 +17,7 @@ elasticClient.ping({
     requestTimeout: 30000,
 }, function(error) {
     if (error) {
-        console.error('Something went wrong with Elasticsearch: ' + error);
+        console.error('Something went wrong with Elasticsearch ' + envProps.elasticHost + ':' + error.message);
     } else {
         console.log('Elasticsearch client connected');
 
