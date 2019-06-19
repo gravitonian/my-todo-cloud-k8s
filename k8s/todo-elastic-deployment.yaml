@@ -18,6 +18,15 @@ spec:
         todo-app-pod: todo-elastic
     spec:
       restartPolicy: Always
+      initContainers:
+      - name: fix-permissions
+        image: busybox
+        command: ["sh", "-c", "chown -R 1000:1000 /usr/share/elasticsearch/data"]
+        securityConytext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /usr/share/elasticsearch/data
+          name: elastic-data
       containers:
       - name: todo-elastic
         image: elasticsearch:6.6.1
