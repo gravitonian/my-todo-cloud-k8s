@@ -74,7 +74,8 @@ after_success:
  - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
 
  # Take the built production images and push to Docker Hub
- - docker-compose -f docker-compose.yml -f docker-compose.prod.yml push
+ - docker-compose -f docker-compose.yml -f docker-compose.prod.yml push -e TAG=latest
+ - docker-compose -f docker-compose.yml -f docker-compose.prod.yml push -e TAG=1.0.$TRAVIS_BUILD_NUMBER
 
 # Deploy to AWS Kubernetes cluster
 #deploy:
