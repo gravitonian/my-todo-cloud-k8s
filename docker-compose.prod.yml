@@ -3,54 +3,54 @@ version: "2"
 
 services:
   todo-postgres:
-    image: gravitonian/todo-postgres:1.0
+    image: gravitonian/todo-postgres
 
   todo-cache-ingestion:
     build:
       dockerfile: ../Dockerfile.nodejs.prod
-    image: gravitonian/todo-cache-ingestion:1.0
+    image: gravitonian/todo-cache-ingestion
 
   todo-cache-service:
     build:
       dockerfile: ../Dockerfile.nodejs.prod
-    image: gravitonian/todo-cache-service:1.0
+    image: gravitonian/todo-cache-service
 
   todo-search-ingestion:
     build:
       dockerfile: ../Dockerfile.nodejs.prod
-    image: gravitonian/todo-search-ingestion:1.0
+    image: gravitonian/todo-search-ingestion
     command: sh /home/node/app/start.sh
 
   todo-search-service:
     build:
       dockerfile: ../Dockerfile.nodejs.prod
-    image: gravitonian/todo-search-service:1.0
+    image: gravitonian/todo-search-service
     command: sh /home/node/app/start.sh
 
   todo-storage-ingestion:
     build:
       dockerfile: ../Dockerfile.nodejs.prod
-    image: gravitonian/todo-storage-ingestion:1.0
+    image: gravitonian/todo-storage-ingestion
     command: sh /home/node/app/start.sh
 
   todo-storage-service:
     build:
       dockerfile: ../Dockerfile.nodejs.prod
-    image: gravitonian/todo-storage-service:1.0
+    image: gravitonian/todo-storage-service
 
   todo-api-gateway:
     build:
       dockerfile: ../Dockerfile.nodejs.prod
-    image: gravitonian/todo-api-gateway:1.0
+    image: gravitonian/todo-api-gateway
     command: sh /home/node/app/start.sh
 
   todo-view:
     build:
       dockerfile: Dockerfile.prod
-    image: gravitonian/todo-view:1.0
+    image: gravitonian/todo-view
     ports:
       - 4201:8080
 
   todo-proxy:
-    image: gravitonian/todo-proxy:1.0
+    image: gravitonian/todo-proxy
 
