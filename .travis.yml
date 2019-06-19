@@ -20,10 +20,11 @@ before_install:
 - sudo mv docker-compose /usr/local/bin
 - docker-compose --version
 # Install aws client
-- sudo apt-get install python2.7
-- curl -O https://bootstrap.pypa.io/get-pip.py
-- sudo python2.7 get-pip.py
-- sudo pip install awscli
+- pip install --user awscli
+#- sudo apt-get install python2.7
+#- curl -O https://bootstrap.pypa.io/get-pip.py
+#- sudo python2.7 get-pip.py
+#- sudo pip install awscli
 # Install Kubectl
 - curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 - chmod +x ./kubectl
