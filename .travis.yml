@@ -33,6 +33,8 @@ before_install:
 - curl -LO https://git.io/get_helm.sh
 - chmod 700 get_helm.sh
 - ./get_helm.sh
+- helm repo add $HELM_PRIVATE_REPO_NAME $HELM_PRIVATE_REPO_URL
+- helm repo update
 
 #install:
 
@@ -80,7 +82,11 @@ after_success:
  - docker push $DOCKER_HUB_ID/todo-view:1.0.$TRAVIS_BUILD_NUMBER
  - docker push $DOCKER_HUB_ID/todo-proxy:1.0.$TRAVIS_BUILD_NUMBER
 
+ # Upgrade Todo release
+ helm upgrade --set todoVersion=1.0.$TRAVIS_BUILD_NUMBER $HELM_TODO_RELEASE_NAME
+
+
 # Deploy to AWS Kubernetes cluster
-deploy:
-  provider: script
-  script: deploy.sh
+#deploy:
+ # provider: script
+  #script: deploy.sh
