@@ -81,6 +81,6 @@ after_success:
  - docker push $DOCKER_HUB_ID/todo-proxy:1.0.$TRAVIS_BUILD_NUMBER
 
 # Deploy to AWS Kubernetes cluster
-#deploy:
- # provider: script
-  #script: deploy.sh
+deploy:
+  provider: script
+  script: deploy.sh
