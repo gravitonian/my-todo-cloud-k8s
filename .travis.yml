@@ -29,11 +29,11 @@ before_install:
 - curl -LO https://git.io/get_helm.sh
 - chmod 700 get_helm.sh
 - ./get_helm.sh
+# Initialize helm client side only, tiller is already installed in cluster
+- helm init --client-only
 # Add our Helm repo
 - helm repo add $HELM_PRIVATE_REPO_NAME $HELM_PRIVATE_REPO_URL
 - helm repo update
-# Initialize helm client side only, tiller is already installed in cluster
-- helm init --client-only
 
 #install:
 
