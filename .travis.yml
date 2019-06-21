@@ -9,8 +9,9 @@ addons:
    packages:
      - docker-ce
 
-# Install any dependencies, update Docker Compose to 1.23.2 so we can use Dockerfile outside build context
+# Install any dependencies
 before_install:
+# Update Docker Compose to 1.23.2 so we can use Dockerfile outside build context
 - docker --version
 - docker-compose --version
 - sudo rm /usr/local/bin/docker-compose
@@ -18,25 +19,67 @@ before_install:
 - chmod +x docker-compose
 - sudo mv docker-compose /usr/local/bin
 - docker-compose --version
+# Install Kubectl
+- curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+- chmod +x ./kubectl
+- sudo mv ./kubectl /usr/local/bin/kubectl
+# Verify cluster context
+- kubectl config current-context
+# Install Helm
+- curl -LO https://git.io/get_helm.sh
+- chmod 700 get_helm.sh
+- ./get_helm.sh
+# Initialize helm client side only, tiller is already installed in cluster
+- helm init --client-only
+# Add our Helm repo
+- helm repo add $HELM_PRIVATE_REPO_NAME $HELM_PRIVATE_REPO_URL
+- helm repo update
 
 #install:
 
 # Build development images for test
 before_script:
- - docker build ./todo-view -f ./todo-view/Dockerfile.dev -t gravitonian/todo-view-test
- - docker build ./todo-cache-service -f Dockerfile.nodejs.dev -t gravitonian/todo-cache-service-test
+ - docker build ./todo-view -f ./todo-view/Dockerfile.dev -t $DOCKER_HUB_ID/todo-view-test
+ - docker build ./todo-cache-service -f Dockerfile.nodejs.dev -t $DOCKER_HUB_ID/todo-cache-service-test
 
 # Run some tests
 script:
- - docker run gravitonian/todo-view-test npm test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
- - docker run gravitonian/todo-cache-service-test npm test
+ - docker run $DOCKER_HUB_ID/todo-view-test npm test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
+ - docker run $DOCKER_HUB_ID/todo-cache-service-test npm test
 
 after_success:
- # Build Production Images for deployment
+ # Build Production Images for deployment (latest)
  - docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
+
+ # Now, tag every image with an extra build number tag
+ - docker tag $DOCKER_HUB_ID/todo-postgres $DOCKER_HUB_ID/todo-postgres:1.0.$TRAVIS_BUILD_NUMBER
+ - docker tag $DOCKER_HUB_ID/todo-cache-ingestion $DOCKER_HUB_ID/todo-cache-ingestion:1.0.$TRAVIS_BUILD_NUMBER
+ - docker tag $DOCKER_HUB_ID/todo-cache-service $DOCKER_HUB_ID/todo-cache-service:1.0.$TRAVIS_BUILD_NUMBER
+ - docker tag $DOCKER_HUB_ID/todo-search-ingestion $DOCKER_HUB_ID/todo-search-ingestion:1.0.$TRAVIS_BUILD_NUMBER
+ - docker tag $DOCKER_HUB_ID/todo-search-service $DOCKER_HUB_ID/todo-search-service:1.0.$TRAVIS_BUILD_NUMBER
+ - docker tag $DOCKER_HUB_ID/todo-storage-ingestion $DOCKER_HUB_ID/todo-storage-ingestion:1.0.$TRAVIS_BUILD_NUMBER
+ - docker tag $DOCKER_HUB_ID/todo-storage-service $DOCKER_HUB_ID/todo-storage-service:1.0.$TRAVIS_BUILD_NUMBER
+ - docker tag $DOCKER_HUB_ID/todo-api-gateway $DOCKER_HUB_ID/todo-api-gateway:1.0.$TRAVIS_BUILD_NUMBER
+ - docker tag $DOCKER_HUB_ID/todo-view $DOCKER_HUB_ID/todo-view:1.0.$TRAVIS_BUILD_NUMBER
+ - docker tag $DOCKER_HUB_ID/todo-proxy $DOCKER_HUB_ID/todo-proxy:1.0.$TRAVIS_BUILD_NUMBER
 
  # Login to Docker Hub
  - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_ID" --password-stdin
 
- # Take the built production images and push to Docker Hub
+ # Take the built production images (latest) and push to Docker Hub
  - docker-compose -f docker-compose.yml -f docker-compose.prod.yml push
+
+ # Now push the images tagged with build numbers
+ - docker push $DOCKER_HUB_ID/todo-postgres:1.0.$TRAVIS_BUILD_NUMBER
+ - docker push $DOCKER_HUB_ID/todo-cache-ingestion:1.0.$TRAVIS_BUILD_NUMBER
+ - docker push $DOCKER_HUB_ID/todo-cache-service:1.0.$TRAVIS_BUILD_NUMBER
+ - docker push $DOCKER_HUB_ID/todo-search-ingestion:1.0.$TRAVIS_BUILD_NUMBER
+ - docker push $DOCKER_HUB_ID/todo-search-service:1.0.$TRAVIS_BUILD_NUMBER
+ - docker push $DOCKER_HUB_ID/todo-storage-ingestion:1.0.$TRAVIS_BUILD_NUMBER
+ - docker push $DOCKER_HUB_ID/todo-storage-service:1.0.$TRAVIS_BUILD_NUMBER
+ - docker push $DOCKER_HUB_ID/todo-api-gateway:1.0.$TRAVIS_BUILD_NUMBER
+ - docker push $DOCKER_HUB_ID/todo-view:1.0.$TRAVIS_BUILD_NUMBER
+ - docker push $DOCKER_HUB_ID/todo-proxy:1.0.$TRAVIS_BUILD_NUMBER
+
+ # Upgrade Todo release
+ - helm upgrade $HELM_TODO_RELEASE_NAME $HELM_PRIVATE_REPO_NAME/todo --set todoVersion=1.0.$TRAVIS_BUILD_NUMBER
