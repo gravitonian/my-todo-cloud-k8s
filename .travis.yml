@@ -83,7 +83,7 @@ after_success:
  - docker push $DOCKER_HUB_ID/todo-proxy:1.0.$TRAVIS_BUILD_NUMBER
 
  # Upgrade Todo release
- helm upgrade --set todoVersion=1.0.$TRAVIS_BUILD_NUMBER $HELM_TODO_RELEASE_NAME
+ - helm upgrade --set todoVersion=1.0.$TRAVIS_BUILD_NUMBER $HELM_TODO_RELEASE_NAME
 
 
 # Deploy to AWS Kubernetes cluster
