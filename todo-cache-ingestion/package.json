@@ -13,6 +13,6 @@
   "dependencies": {
     "amqplib": "^0.5.3",
     "axios": "^0.18.0",
-    "redis": "^2.8.0"
+    "redis": "^3.1.1"
   }
 }
